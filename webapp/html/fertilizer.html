@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Fertilizer Recommendation</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cropsuggestionsystem.s3.us-east-2.amazonaws.com/styles/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script>
+        // N,P,K,pH,soil_moisture
+        // 20,60,20,5.5,90
+        function handleFormSubmit(){
+            formdata = Object.fromEntries(new FormData(document.querySelector('form')).entries());
+            reqdata={
+                nitrogen:20-formdata.nitrogen,
+                phosphorous:60-formdata.phosphorous,
+                pottasium:20-formdata.pottasium,
+                ph:5.5-formdata.ph,
+                soil_moisture:90-formdata.soil_moisture
+            };
+            document.getElementById("result").innerText = JSON.stringify(reqdata);
+        }
+        window.onload = () => document.getElementById("submit-id").addEventListener("click", handleFormSubmit);
+    </script>
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="crop.html">Crop</a></li>
+                    <li class="active"><a href="#">Fertilizer</a></li>
+                    <li><a href="disease.html">Disease</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid text-center">
+        <div class="row content">
+            <div>
+                <!--Form Section-->
+                <br /><br />
+                <h2 style="text-align: center; margin: 0px; color: black">
+                    <b>Get informed advice on fertilizer based on soil</b>
+                </h2>
+                <br />
+
+                <div style="
+    width: 350px;
+    height: 40rem;
+    margin: 0px auto;
+    color: black;
+    border-radius: 25px;
+    padding: 10px 10px;
+  ">
+                    <form method="POST" action="/fertilizer-predict">
+                        <div class="form-group">
+                            <label for="Nitrogen" style="font-size: 17px"><b>Nitrogen</b></label>
+                            <input type="number" class="form-control" id="Nitrogen" name="nitrogen"
+                                placeholder="Enter the value (example:50)" style="font-weight: bold" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="Phosphorous" style="font-size: 17px"><b>Phosphorous</b></label>
+                            <input type="number" class="form-control" id="Phosphorous" name="phosphorous"
+                                placeholder="Enter the value (example:50)" style="font-weight: bold" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Pottasium" style="font-size: 17px"><b>Pottasium</b></label>
+                            <input type="number" class="form-control" id="Pottasium" name="pottasium"
+                                placeholder="Enter the value (example:50)" style="font-weight: bold" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="ph" style="font-size: 17px"><b>ph Level</b></label>
+                            <input type="number" step="0.01" class="form-control" id="ph" name="ph" placeholder="Enter the value"
+                              style="font-weight: bold" required />
+                          </div>
+                          <div class="form-group">
+                            <label for="soil_moisture" style="font-size: 17px"><b>Soil Moisture (in mm)</b></label>
+                            <input type="number" step="0.01" class="form-control" id="soil_moisture" name="soil_moisture"
+                              placeholder="Enter the value" style="font-weight: bold" required />
+                          </div>
+                          <div class="d-flex justify-content-center">
+                            <button type="button" class="btn btn-primary" id="submit-id">Submit</button>
+                          </div>
+                    </form>
+                    <br>
+                    <div class="row">
+                        <div class="col-12 col-md-8"><label style="font-size: 17px"><b>Your Results appear here:</b></label></div>
+                        <div class="col-6 col-md-4"><label style="font-size: 17px"><b id="result"></b></label></div>
+                      </div>
+                      <br><br>
+                </div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Disease Detection</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cropsuggestionsystem.s3.us-east-2.amazonaws.com/styles/styles.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script>
+
+    function getBase64(file){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          let encoded = reader.result.toString().replace(/^data:(.*,)?/, '');
+          if ((encoded.length % 4) > 0) {
+            encoded += '='.repeat(4 - (encoded.length % 4));
+          }
+          resolve(encoded);
+        };
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    function handleFormSubmit(event) {
+      getBase64(document.getElementById("inputfile").files[0]).then((img) => {
+        fetch("https://16yimtod7h.execute-api.us-east-2.amazonaws.com/default/diseasedetection", {
+          method: 'POST',
+          body: JSON.stringify({
+            "img": img
+          })
+        }).then((resp) => {
+          return resp.json();
+        }).then((body) => {
+          document.getElementById("result").innerText = body['predictedClass'];
+        }).catch((error) => {
+          document.getElementById("result").innerText = "Sorry! Encountered a Problem";
+        })
+      });
+    }
+
+    window.onload = () => document.getElementById("submit-id").addEventListener("click", handleFormSubmit);
+    
+  </script>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <div class="collapse navbar-collapse" id="myNavbar">
+        <ul class="nav navbar-nav">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="crop.html">Crop</a></li>
+          <li><a href="fertilizer.html">Fertilizer</a></li>
+          <li class="active"><a href="#">Disease</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid text-center">
+    <form action='http://localhost:9000/2015-03-31/functions/function/invocations'>
+      <br>
+      <h2 class="h4 mb-3 font-weight-normal"><b>Please Upload The Image</b></h2>
+      <input type="file" name="img" class="form-control-file" id="inputfile" style="font-weight: bold;" >
+      <br>
+      <div class="d-flex justify-content-center">
+        <button type="button" class="btn btn-primary" id="submit-id">Submit</button>
+      </div>
+    </form>
+    <br>
+    <div class="row">
+      <div class="col-12 col-md-8"><label style="font-size: 17px"><b>Your Results appear here:</b></label></div>
+      <div class="col-6 col-md-4"><label style="font-size: 17px"><b id="result"></b></label></div>
+    </div>
+    <br><br>
+  </div>
+
+</body>
+
+</html>
