@@ -1,26 +1,28 @@
 import numpy as np
 from json import loads, dumps
 from base64 import b64decode
+from io import BytesIO
+from PIL import Image, ImageOps
 from traceback import print_exc
-from tensorflow.io import decode_image
-from tensorflow.image import resize
 from tensorflow.keras.models import load_model
 
 model = load_model('model.h5')
-classes = ['Tomato_Bacterial_spot', 'Tomato_Early_blight', 'Tomato_Late_blight', 'Tomato_Leaf_Mold', 'Tomato_Septoria_leaf_spot', 'Tomato_Spider_mites_Two_spotted_spider_mite', 'Tomato__Target_Spot', 'Tomato__Tomato_YellowLeaf__Curl_Virus', 'Tomato__Tomato_mosaic_virus', 'Tomato_healthy']
+classes = ['Tomato__Target_Spot', 'Tomato__Tomato_mosaic_virus', 'Tomato__Tomato_YellowLeaf__Curl_Virus', 'Tomato_Bacterial_spot', 'Tomato_Early_blight', 'Tomato_healthy', 'Tomato_Late_blight', 'Tomato_Leaf_Mold', 'Tomato_Septoria_leaf_spot', 'Tomato_Spider_mites_Two_spotted_spider_mite']
 
 def predict_class(b64_image):
-    img = decode_image(b64decode(b64_image), channels=3)
-    img = resize(img, size=(256, 256))
-    img = np.expand_dims(img, axis=0)
-    result = classes[np.argmax(model.predict(img))]
+    data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+    img = Image.open(BytesIO(b64decode(b64_image)))
+    img = ImageOps.fit(img, (224, 224), Image.ANTIALIAS)
+    normalized_img = (np.asarray(img).astype(np.float32) / 127.0) - 1
+    data[0] = normalized_img
+    result = classes[np.argmax(model.predict(data))]
     return result
 
 def handler(event, context):
     try:
         body = loads(event['body'])
         b64_image = body['img']
-        # b64_image = b64_image[b64_image.find(",")+1:] + "==="
+        b64_image = b64_image[b64_image.find(",")+1:] + "==="
         return {
             "statusCode": 200,
         	"headers":{
